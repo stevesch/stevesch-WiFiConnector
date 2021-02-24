@@ -4,8 +4,6 @@ Provides simplified WiFi Manager and over-the-air update setup (sketch basically
 
 examples/minimal provides a simple sketch that loops and outputs status (current SSID, IP, etc.) on the serial port.
 
-![Example Screencap](examples/minimal/example-minimal-screencap.jpg)
-
 # Building and Running
 
 To get up-and-running:
