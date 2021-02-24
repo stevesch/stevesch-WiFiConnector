@@ -28,7 +28,7 @@ The following page should be displayed:
 
 Building from this example, you can replace the HTML with your own page and page handling code.
 
-- Over-the-air updating
+## Over-the-air updating
 
 Once you are able to properly connect and view your web page, over-the-air updates can be performed using the platforio build configurations ending in "-OTA" (these are preconfigured to use the host name and optional password of "0000" specified in the platformio.ini file).
 Choose "Upload" to upload code changes, and "Upload Filesystem Image" to upload files in your data folder to the SPIFFS file system (if you have added such files to the sketch).
