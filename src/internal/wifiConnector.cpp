@@ -10,7 +10,10 @@
 namespace {
 void mgrSetup();
 void mgrConfig();
-void mgrLoop();
+// void mgrLoop();
+
+String sConfigPortalName;
+String sConfigPortalPassword;
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -8 * 3600;
@@ -20,12 +23,7 @@ std::function<void (bool)> indicateConfigActive = [](bool active){};
 
 //////////////////////////////////////////////////////////////////////////////
 
-// "isUpdating" == "an OTA update of code or files is occurring"
-static bool sbUpdating = false;
-bool isUpdating() {
-  return sbUpdating;
-}
-
+bool sbUpdating = false;
 
 void setUpdating(bool updating)
 {
@@ -65,14 +63,14 @@ AsyncWiFiManager* wifiManager = nullptr;
 
 void otaSetup()
 {
-#ifdef ESP_NAME
-  ArduinoOTA.setHostname(ESP_NAME);
-#endif
+  if (!sConfigPortalName.isEmpty()) {
+    ArduinoOTA.setHostname(sConfigPortalName.c_str());
+  }
 
-#ifdef ESP_AUTH
   // No authentication by default
-  ArduinoOTA.setPassword(ESP_AUTH);
-#endif
+  if (!sConfigPortalPassword.isEmpty()) {
+    ArduinoOTA.setPassword(sConfigPortalPassword.c_str());
+  }
 
   ArduinoOTA
     .onStart([]() {
@@ -154,8 +152,7 @@ void mgrSetup()
   wifiManager->setAPCallback(configModeCallback);
   wifiManager->setSaveConfigCallback(saveConfigCallback);
 
-  // wifiManager->autoConnect(ESP_NAME, ESP_AUTH);
-  wifiManager->startConfigPortal(ESP_NAME, ESP_AUTH);
+  mgrConfig();
 }
 
 void mgrConfig()
@@ -166,41 +163,23 @@ void mgrConfig()
   }
   Serial.println("WiFiConnector: starting config...");
   indicateConfigActive(true);
-  wifiManager->startConfigPortal(ESP_NAME, ESP_AUTH);
+
+  const char* portalName = sConfigPortalName.c_str();
+  const char* portalAuth = !sConfigPortalPassword.isEmpty() ? sConfigPortalPassword.c_str() : nullptr;
+  wifiManager->startConfigPortal(portalName, portalAuth);
 }
 
+// void mgrLoop()
+// {
+// }
 
-void mgrLoop()
-{
-}
-
-static bool lastStatusConnected = false;
+bool lastStatusConnected = false;
 void wifiClear()
 {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     lastStatusConnected = WiFi.status() == WL_CONNECTED;
     delay(100);
-}
-
-const char* rowBegin() { return "<p class=aligned-row>"; }
-const char* rowEnd() { return "</p>"; }
-
-String createButton(String label, String link)
-{
-  String str = "<a class='button button-off' onclick=\"location.href='";
-  str += link;
-  str += "';\" >";
-  str += label;
-  str += "</a>";
-  return str;
-
-  // String str = "<a class=\"button button-off\" href=\"";
-  // str += link;
-  // str += "\">";
-  // str += label;
-  // str += "</a>";
-  // return str;
 }
 
 void handleConfig(AsyncWebServerRequest* request) {
@@ -218,20 +197,39 @@ void wifiConnected()
 
   setClockTime();
 }
+
+void formatDeviceId(String& nameOut)
+{
+  uint64_t chipid = ESP.getEfuseMac(); // i.e. MAC address, 6 bytes
+  uint16_t chip = (uint16_t)(chipid>>32);
+  char name[32];
+  snprintf(name, 31, "esp32-%04X", chip);
+  nameOut = name;
+}
 } // namespace
 
 namespace stevesch {
 namespace WiFiConnector {
-void setup(AsyncWebServer* server) 
+void setup(AsyncWebServer* server,
+  char const* configPortalName,
+  char const* configPortalPassword)
 {
   Serial.println("WiFiConnector: Starting WiFi...");
   // This is a little kludgy, but the AsyncWiFiManager constructor
   wifiManager = new AsyncWiFiManager(server, &dnsServer);
 
   wifiClear();
-#ifdef ESP_NAME
-  WiFi.setHostname(ESP_NAME);
-#endif
+
+  if (configPortalPassword) {
+    sConfigPortalPassword = configPortalPassword;
+  }
+  if (configPortalName) {
+    sConfigPortalName = configPortalName;
+  } else {
+    formatDeviceId(sConfigPortalName);
+  }
+
+  WiFi.setHostname(sConfigPortalName.c_str());
 
   mgrSetup();
 
@@ -250,13 +248,17 @@ void config()
 
 void loop() 
 {
-  mgrLoop();
+  // mgrLoop();
   otaLoop();
 }
 
 void setActivityIndicator(std::function<void (bool)> fn)
 {
   indicateConfigActive = fn;
+}
+
+bool isUpdating() {
+  return sbUpdating;
 }
 
 } // namespace WiFiConnector

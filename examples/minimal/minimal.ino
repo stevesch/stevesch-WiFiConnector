@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <ESPAsyncWebServer.h>
+
 #include <stevesch-WiFiConnector.h>
 
 // some simple timing and log output
@@ -7,12 +9,14 @@ constexpr long kLogPeriod = 1000;
 int logsPerformed = 0;
 void printWiFiStaus();
 
+AsyncWebServer server(80);
+
 void setup()
 {
   Serial.begin(115200);
   while (!Serial);
 
-  stevesch::WiFiConnector::setup();
+  stevesch::WiFiConnector::setup(&server);
 }
 
 void loop()
@@ -34,13 +38,12 @@ void loop()
 void printWiFiStaus()
 {
   String strIp = WiFi.localIP().toString();
-  Serial.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d  range: %4d (r:%2d to:%2d)\n",
+  Serial.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d\n",
     WiFi.SSID().c_str(),
     strIp.c_str(),
-    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower(),
-    (int)vrDistance, rangeReadCount, rangeTimeoutCount
+    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower()
   );
-  if (stevesch::WifiConnector::isUpdating()) {
+  if (stevesch::WiFiConnector::isUpdating()) {
     Serial.println("OTA update is being performed");
   }
 }

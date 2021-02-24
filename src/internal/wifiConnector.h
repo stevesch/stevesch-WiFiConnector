@@ -6,16 +6,19 @@ class AsyncWebServer; // from <ESPAsyncWebServer.h>
 
 namespace stevesch
 {
-namespace WifiConnector {
+namespace WiFiConnector {
 // callback is called when wifi config starts/stops-- call
 // before wifiSetup to receive all notifications:
 void setActivityIndicator(std::function<void (bool)> callback);
 
-void setup(AsyncWebServer* server);
+void setup(AsyncWebServer* server,
+  char const* configPortalName=nullptr,
+  char const* configPortalPassword=nullptr);
+
 void loop();
 void config();
 
-bool isUpdating();
+bool isUpdating(); // "isUpdating" == "an OTA update of code or files is occurring"
 
 }
 }
