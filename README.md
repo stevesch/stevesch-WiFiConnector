@@ -23,3 +23,8 @@ To get up-and-running:
 "http://192.168.x.x" or "http://10.x.x.x"
 
 where x.x/x.x.x matches the address displayed in the serial output from your board).
+
+The following page should be displayed:
+![Example Screencap](examples/minimal/example-minimal-screencap.jpg)
+
+Building from this example, you can replace the HTML with your own page and page handling code.
