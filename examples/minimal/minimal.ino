@@ -72,18 +72,34 @@ p { font-size: 1.2rem; }
 <div><p>SSID: %SSID_FIELD%</p></div>
 <div><p>Name: %NAME_FIELD%</p></div>
 <div><p>IP: %IP_FIELD%</p></div>
+<div><p>Loaded at: %TIME%</p></div>
 </body></html>)delim";
+
+
+String getLocalTime()
+{
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    return "Failed to obtain time";
+  }
+
+  char timeStringBuff[64];
+  strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+  return String(timeStringBuff);
+}
 
 void handleIndex(AsyncWebServerRequest *request)
 {
   String strSsid(WiFi.SSID());
   String strName(WiFi.getHostname());
   String strIp(WiFi.localIP().toString());
+  String strTime(getLocalTime());
   String str(kSimplePage);
   // Note: these fields are replaced once (only upon initial page load):
   str.replace("%SSID_FIELD%", strSsid.c_str());
   str.replace("%NAME_FIELD%", strName.c_str());
   str.replace("%IP_FIELD%", strIp.c_str());
+  str.replace("%TIME%", strTime.c_str());
   request->send(200, "text/html", str);
 }
 
