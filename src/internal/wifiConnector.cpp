@@ -7,9 +7,10 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
-static void mgrSetup();
-static void mgrConfig();
-static void mgrLoop();
+namespace {
+void mgrSetup();
+void mgrConfig();
+void mgrLoop();
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -8 * 3600;
@@ -42,7 +43,7 @@ void printLocalTime()
 {
   struct tm timeinfo;
   if(!getLocalTime(&timeinfo)){
-    Serial.println("WiFi Connector: Failed to obtain time");
+    Serial.println("WiFiConnector: Failed to obtain time");
     return;
   }
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
@@ -84,7 +85,7 @@ void otaSetup()
       }
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       setUpdating(true);
-      Serial.println("WiFi Connector: Start updating " + type);
+      Serial.println("WiFiConnector: Start updating " + type);
     })
     .onEnd([]() {
       Serial.println("\nEnd");
@@ -127,7 +128,7 @@ void otaLoop()
 
 void configModeCallback(AsyncWiFiManager* mgr)
 {
-  Serial.println("WiFi Connector: Entered config mode");
+  Serial.println("WiFiConnector: Entered config mode");
   Serial.println(WiFi.softAPIP());
   Serial.println(mgr->getConfigPortalSSID());
 }
@@ -137,7 +138,7 @@ bool shouldSaveConfig = false;
 //callback notifying us of the need to save config
 void saveConfigCallback ()
 {
-  Serial.println("Should save config");
+  Serial.println("WiFiConnector: should save config");
   shouldSaveConfig = true;
 
   if (WiFi.isConnected()) {
@@ -160,10 +161,10 @@ void mgrSetup()
 void mgrConfig()
 {
   if (!wifiManager) {
-    Serial.println("WiFi Connector ERROR: call wifiSetup before calling wifiConfig");
+    Serial.println("WiFiConnector ERROR: call WiFiConnector::setup before calling WiFiConnector::config");
     return;
   }
-  Serial.println("WiFi Connector: starting config...");
+  Serial.println("WiFiConnector: starting config...");
   indicateConfigActive(true);
   wifiManager->startConfigPortal(ESP_NAME, ESP_AUTH);
 }
@@ -180,43 +181,6 @@ void wifiClear()
     WiFi.disconnect();
     lastStatusConnected = WiFi.status() == WL_CONNECTED;
     delay(100);
-}
-
-void wifiSetActivityIndicator(std::function<void (bool)> fn)
-{
-  indicateConfigActive = fn;
-}
-
-void wifiSetup(AsyncWebServer* server) 
-{
-  Serial.println("WiFi Connector: Starting WiFi...");
-  // This is a little kludgy, but the AsyncWiFiManager constructor
-  wifiManager = new AsyncWiFiManager(server, &dnsServer);
-
-  wifiClear();
-#ifdef ESP_NAME
-  WiFi.setHostname(ESP_NAME);
-#endif
-
-  mgrSetup();
-
-  // -- Set up required URL handlers on the web server.
-  server->on("/config", HTTP_GET, handleConfig);
-
-  otaSetup();
-
-  Serial.println("WiFi Connector: WiFi Ready.");
-}
-
-void wifiConfig()
-{
-  mgrConfig();
-}
-
-void wifiLoop() 
-{
-  mgrLoop();
-  otaLoop();
 }
 
 const char* rowBegin() { return "<p class=aligned-row>"; }
@@ -240,7 +204,7 @@ String createButton(String label, String link)
 }
 
 void handleConfig(AsyncWebServerRequest* request) {
-  String str = "WiFi Connector: handleConfig";
+  String str = "WiFiConnector: handleConfig";
   Serial.println(str);
   mgrConfig();
   request->redirect("/");
@@ -248,9 +212,52 @@ void handleConfig(AsyncWebServerRequest* request) {
 
 void wifiConnected()
 {
-  Serial.println("WiFi Connector: WiFi connected.");
+  Serial.println("WiFiConnector: WiFi connected.");
   otaOnWifiConnect();
   indicateConfigActive(false);
 
   setClockTime();
 }
+} // namespace
+
+namespace stevesch {
+namespace WiFiConnector {
+void setup(AsyncWebServer* server) 
+{
+  Serial.println("WiFiConnector: Starting WiFi...");
+  // This is a little kludgy, but the AsyncWiFiManager constructor
+  wifiManager = new AsyncWiFiManager(server, &dnsServer);
+
+  wifiClear();
+#ifdef ESP_NAME
+  WiFi.setHostname(ESP_NAME);
+#endif
+
+  mgrSetup();
+
+  // -- Set up required URL handlers on the web server.
+  server->on("/config", HTTP_GET, handleConfig);
+
+  otaSetup();
+
+  Serial.println("WiFiConnector: WiFi Ready.");
+}
+
+void config()
+{
+  mgrConfig();
+}
+
+void loop() 
+{
+  mgrLoop();
+  otaLoop();
+}
+
+void setActivityIndicator(std::function<void (bool)> fn)
+{
+  indicateConfigActive = fn;
+}
+
+} // namespace WiFiConnector
+} // namespace stevesch
