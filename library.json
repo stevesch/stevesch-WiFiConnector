@@ -1,0 +1,19 @@
+{
+  "name": "stevesch-WiFiConnector",
+  "keywords": "WiFi, manager, config",
+  "description": "Simplified WiFi manager setup for Arduino and embedded applications",
+  "repository":
+  {
+    "type": "git",
+    "url": ""
+  },
+  "exclude": "tests",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "authors":
+  {
+    "name": "Stephen Schlueter",
+    "url": "",
+    "maintainer": true
+  }
+}
