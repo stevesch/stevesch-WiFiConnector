@@ -17,6 +17,7 @@ void setup()
   while (!Serial);
 
   stevesch::WiFiConnector::setup(&server);
+  server.begin();
 }
 
 void loop()

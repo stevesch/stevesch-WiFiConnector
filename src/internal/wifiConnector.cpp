@@ -1,4 +1,4 @@
-#include "wifiConnector.h"
+#include "wiFiConnector.h"
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -56,10 +56,10 @@ void setClockTime()
 
 void handleConfig(AsyncWebServerRequest* request);
 
-void wifiConnected();
+void wiFiConnected();
 
 DNSServer dnsServer;
-AsyncWiFiManager* wifiManager = nullptr;
+AsyncWiFiManager* wiFiManager = nullptr;
 
 void otaSetup()
 {
@@ -140,24 +140,24 @@ void saveConfigCallback ()
   shouldSaveConfig = true;
 
   if (WiFi.isConnected()) {
-    wifiConnected();
+    wiFiConnected();
   }
 }
 
 void mgrSetup()
 {
   // WiFiManagerParameter custom_mqtt_server("server", "mqtt server", mqtt_server, 40);
-  // wifiManager->addParameter(&custom_mqtt_server);
+  // wiFiManager->addParameter(&custom_mqtt_server);
 
-  wifiManager->setAPCallback(configModeCallback);
-  wifiManager->setSaveConfigCallback(saveConfigCallback);
+  wiFiManager->setAPCallback(configModeCallback);
+  wiFiManager->setSaveConfigCallback(saveConfigCallback);
 
   mgrConfig();
 }
 
 void mgrConfig()
 {
-  if (!wifiManager) {
+  if (!wiFiManager) {
     Serial.println("WiFiConnector ERROR: call WiFiConnector::setup before calling WiFiConnector::config");
     return;
   }
@@ -166,7 +166,7 @@ void mgrConfig()
 
   const char* portalName = sConfigPortalName.c_str();
   const char* portalAuth = !sConfigPortalPassword.isEmpty() ? sConfigPortalPassword.c_str() : nullptr;
-  wifiManager->startConfigPortal(portalName, portalAuth);
+  wiFiManager->startConfigPortal(portalName, portalAuth);
 }
 
 // void mgrLoop()
@@ -174,7 +174,7 @@ void mgrConfig()
 // }
 
 bool lastStatusConnected = false;
-void wifiClear()
+void wiFiClear()
 {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
@@ -189,7 +189,7 @@ void handleConfig(AsyncWebServerRequest* request) {
   request->redirect("/");
 }
 
-void wifiConnected()
+void wiFiConnected()
 {
   Serial.println("WiFiConnector: WiFi connected.");
   otaOnWifiConnect();
@@ -216,9 +216,9 @@ void setup(AsyncWebServer* server,
 {
   Serial.println("WiFiConnector: Starting WiFi...");
   // This is a little kludgy, but the AsyncWiFiManager constructor
-  wifiManager = new AsyncWiFiManager(server, &dnsServer);
+  wiFiManager = new AsyncWiFiManager(server, &dnsServer);
 
-  wifiClear();
+  wiFiClear();
 
   if (configPortalPassword) {
     sConfigPortalPassword = configPortalPassword;
