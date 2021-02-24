@@ -25,6 +25,7 @@ To get up-and-running:
 where x.x/x.x.x matches the address displayed in the serial output from your board).
 
 The following page should be displayed:
+
 ![Example Screencap](examples/minimal/example-minimal-screencap.jpg)
 
 Building from this example, you can replace the HTML with your own page and page handling code.
