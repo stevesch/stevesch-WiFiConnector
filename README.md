@@ -47,7 +47,7 @@ upload_port = ${ota.esp_name}.local
 
 with your device's IP address, for example:
 
-upload_port = 192.168.x.yyy
+upload_port = 192.168.x.x
 
-(where x.yyy are the digits from the IP of your device-- again, visible from the serial monitor if you attach USB temporarily and monitor the output).
+(where x.x are the digits from the IP of your device-- again, visible from the serial monitor if you attach USB temporarily and monitor the output).
 
