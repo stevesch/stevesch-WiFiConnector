@@ -20,7 +20,8 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
-  stevesch::WiFiConnector::setup(&server, "WiFiConnector-Test");
+  // ESP_NAME and ESP_AUTH are defined in platformio.ini for this example
+  stevesch::WiFiConnector::setup(&server, ESP_NAME, ESP_AUTH);
 
   server.on("/", HTTP_GET, handleIndex);
   server.onNotFound(handlePageNotFound);
