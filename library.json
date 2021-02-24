@@ -15,5 +15,22 @@
     "name": "Stephen Schlueter",
     "url": "",
     "maintainer": true
-  }
+  },
+  "dependencies" : [
+    {
+      "name": "ArduinoOTA",
+    },
+    {
+      "name": "ESPAsyncWiFiManager",
+    },
+    {
+      "name": "ESPAsyncWebServer",
+    },
+    {
+      "name": "ESPmDNS",
+    },
+    {
+      "name": "SPIFFS",
+    }
+  ]
 }
