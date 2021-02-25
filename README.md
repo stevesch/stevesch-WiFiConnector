@@ -10,11 +10,11 @@ To get up-and-running:
 - PlatformIO is recommended
 - Build this library (builds its own minimal example)
 - Upload to any ESP32 board via USB
-- When your board is booted, a WiFi config portal named "WiFiConnector-Test" should be available.
-- Connecting to the "WiFiConnector-Test" WiFi network with any device and set the config options for the WiFi network of your router (choose your network/SSID and set the password).
+- When your board is booted, a WiFi config portal named "wificonnector-test" should be available.
+- Connecting to the "wificonnector-test" WiFi network with any device (default password, specified in the platform.ini file, is 00000000) and set the config options for the WiFi network of your router (choose your network/SSID and enter its password).
 - Connect to your router's WiFi network and open the ESP32 page in any browser.  The IP of the device will be displayed in the serial output if you're monitoring serial output of the board.  If your router supports mDNS, you should be able to open
 
-"http://WiFiConnector-Test.local/"
+"http://wificonnector-test.local/"
 
 (otherwise you'll need to open, e.g.
 
@@ -39,7 +39,7 @@ Choose "Upload" to upload code changes, and "Upload Filesystem Image" to upload 
 
 If you receive this error:
 
-[ERROR]: Host WiFiConnector-Test.local Not Found
+[ERROR]: Host wificonnector-test.local Not Found
 
 Your router is not routing mDNS information.  In this case, you can perform OTA updating by replacing
 
