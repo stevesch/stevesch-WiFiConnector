@@ -58,8 +58,7 @@ void printWiFiStaus()
 }
 
 
-const char kSimplePage[] PROGMEM = R"delim(
-<!DOCTYPE HTML>
+const char kSimplePage[] PROGMEM = R"delim(<!DOCTYPE HTML>
 <html><head><title>WiFiConnector Test Page</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>

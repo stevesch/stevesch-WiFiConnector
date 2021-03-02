@@ -113,8 +113,10 @@ void otaOnWifiConnect()
   ArduinoOTA.begin();
   
   // Add service to MDNS-SD
-  // MDNS.addService("_http", "_tcp", 80);
-  MDNS.addService("http", "tcp", 80);
+  // NOTE: addService will automatically prepend '_' if the service or proto does not
+  // already begin with '_', but we specify it ourselves here for clarity, since
+  // e.g. python calls would need to use the full name with underscore.
+  MDNS.addService("_http", "_tcp", 80);
 }
 
 void otaLoop()
