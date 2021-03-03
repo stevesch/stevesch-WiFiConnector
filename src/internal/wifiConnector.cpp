@@ -169,11 +169,13 @@ void mgrConfig()
   const char* portalName = sConfigPortalName.c_str();
   const char* portalAuth = !sConfigPortalPassword.isEmpty() ? sConfigPortalPassword.c_str() : nullptr;
   wiFiManager->startConfigPortal(portalName, portalAuth);
+  // wiFiManager->startConfigPortalModeless(portalName, portalAuth);
 }
 
 void mgrLoop()
 {
-  wiFiManager->loop();
+  // only for startConfigPortalModeless? causes log spam when startConfigPortal is used
+  // wiFiManager->loop();
 }
 
 bool lastStatusConnected = false;
