@@ -18,10 +18,14 @@
   },
   "dependencies" : [
     {
-      "name": "ESPAsyncWiFiManager"
+      "owner": "alanswx",
+      "name": "ESPAsyncWiFiManager",
+      "version": "^0.23"
     },
     {
-      "name": "ESPAsyncWebServer"
+      "owner": "me-no-dev",
+      "name": "ESP Async WebServer",
+      "version": "^1.2.3"
     }
   ]
 }
