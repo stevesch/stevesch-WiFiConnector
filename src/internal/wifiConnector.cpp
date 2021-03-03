@@ -10,7 +10,7 @@
 namespace {
 void mgrSetup();
 void mgrConfig();
-// void mgrLoop();
+void mgrLoop();
 
 String sConfigPortalName;
 String sConfigPortalPassword;
@@ -171,9 +171,10 @@ void mgrConfig()
   wiFiManager->startConfigPortal(portalName, portalAuth);
 }
 
-// void mgrLoop()
-// {
-// }
+void mgrLoop()
+{
+  wiFiManager->loop();
+}
 
 bool lastStatusConnected = false;
 void wiFiClear()
@@ -250,7 +251,7 @@ void config()
 
 void loop() 
 {
-  // mgrLoop();
+  mgrLoop();
   otaLoop();
 }
 
