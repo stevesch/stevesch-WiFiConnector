@@ -14,6 +14,7 @@ void mgrLoop();
 
 String sConfigPortalName;
 String sConfigPortalPassword;
+bool sModeless = false;
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -8 * 3600;
@@ -140,7 +141,15 @@ void saveConfigCallback ()
 {
   Serial.println("WiFiConnector: should save config");
   shouldSaveConfig = true;
+  indicateConfigActive(false);
 
+  // if (WiFi.isConnected()) {
+  //   wiFiConnected();
+  // }
+}
+
+void accessPointCallback(AsyncWiFiManager* mgr)
+{
   if (WiFi.isConnected()) {
     wiFiConnected();
   }
@@ -153,6 +162,7 @@ void mgrSetup()
 
   wiFiManager->setAPCallback(configModeCallback);
   wiFiManager->setSaveConfigCallback(saveConfigCallback);
+  wiFiManager->setAPCallback(accessPointCallback);
 
   mgrConfig();
 }
@@ -168,17 +178,23 @@ void mgrConfig()
 
   const char* portalName = sConfigPortalName.c_str();
   const char* portalAuth = !sConfigPortalPassword.isEmpty() ? sConfigPortalPassword.c_str() : nullptr;
-  wiFiManager->startConfigPortal(portalName, portalAuth);
-  // wiFiManager->startConfigPortalModeless(portalName, portalAuth);
+  if (sModeless) {
+    wiFiManager->startConfigPortalModeless(portalName, portalAuth);
+  } else {
+    wiFiManager->startConfigPortal(portalName, portalAuth);
+  }
 }
 
 void mgrLoop()
 {
   // only for startConfigPortalModeless? causes log spam when startConfigPortal is used
-  // wiFiManager->loop();
+  if (sModeless) {
+    wiFiManager->loop();
+  }
 }
 
 bool lastStatusConnected = false;
+
 void wiFiClear()
 {
     WiFi.mode(WIFI_STA);
@@ -198,7 +214,6 @@ void wiFiConnected()
 {
   Serial.println("WiFiConnector: WiFi connected.");
   otaOnWifiConnect();
-  indicateConfigActive(false);
 
   setClockTime();
 }
@@ -215,6 +230,12 @@ void formatDeviceId(String& nameOut)
 
 namespace stevesch {
 namespace WiFiConnector {
+
+void enableModeless(bool modeless)
+{
+  sModeless = modeless;
+}
+
 void setup(AsyncWebServer* server,
   char const* configPortalName,
   char const* configPortalPassword)

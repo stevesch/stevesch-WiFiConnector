@@ -10,6 +10,7 @@ namespace WiFiConnector {
 // callback is called when wifi config starts/stops-- call
 // before wifiSetup to receive all notifications:
 void setActivityIndicator(std::function<void (bool)> callback);
+void enableModeless(bool modeless); // call before setup
 
 void setup(AsyncWebServer* server,
   char const* configPortalName=nullptr,
