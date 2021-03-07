@@ -21,6 +21,7 @@ const long  gmtOffset_sec = -8 * 3600;
 const int   daylightOffset_sec = 3600;
 
 std::function<void (bool)> indicateConfigActive = [](bool active){};
+std::function<void (bool)> onConnected = [](bool connected){};
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -197,10 +198,13 @@ bool lastStatusConnected = false;
 
 void wiFiClear()
 {
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-    lastStatusConnected = WiFi.status() == WL_CONNECTED;
-    delay(100);
+  if (WiFi.isConnected()) {
+    onConnected(false);
+  }
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  lastStatusConnected = WiFi.status() == WL_CONNECTED;
+  delay(100);
 }
 
 void handleConfig(AsyncWebServerRequest* request) {
@@ -216,6 +220,7 @@ void wiFiConnected()
   otaOnWifiConnect();
 
   setClockTime();
+  onConnected(true);
 }
 
 void formatDeviceId(String& nameOut)
@@ -281,6 +286,11 @@ void loop()
 void setActivityIndicator(std::function<void (bool)> fn)
 {
   indicateConfigActive = fn;
+}
+
+void setOnConnected(std::function<void (bool)> fn)
+{
+  onConnected = fn;
 }
 
 bool isUpdating() {
