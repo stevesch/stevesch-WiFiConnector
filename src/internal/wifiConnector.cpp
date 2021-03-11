@@ -261,13 +261,12 @@ void setup(AsyncWebServer* server,
   }
 
   WiFi.setHostname(sConfigPortalName.c_str());
+  otaSetup();
 
   mgrSetup();
 
   // -- Set up required URL handlers on the web server.
   server->on("/config", HTTP_GET, handleConfig);
-
-  otaSetup();
 
   Serial.println("WiFiConnector: WiFi Ready.");
 }
