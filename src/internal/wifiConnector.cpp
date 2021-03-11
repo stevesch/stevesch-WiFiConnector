@@ -217,6 +217,7 @@ void handleConfig(AsyncWebServerRequest* request) {
 void wiFiConnected()
 {
   Serial.println("WiFiConnector: WiFi connected.");
+  otaSetup();
   otaOnWifiConnect();
 
   setClockTime();
@@ -261,7 +262,6 @@ void setup(AsyncWebServer* server,
   }
 
   WiFi.setHostname(sConfigPortalName.c_str());
-  otaSetup();
 
   mgrSetup();
 
