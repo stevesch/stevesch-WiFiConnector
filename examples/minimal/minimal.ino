@@ -12,8 +12,31 @@ void printWiFiStaus();
 
 AsyncWebServer server(80);
 
-void handleIndex(AsyncWebServerRequest *request);         // defined below
-void handlePageNotFound(AsyncWebServerRequest* request);  // defined below
+// defined below:
+void handleWifiConnected(bool connected);
+void handleIndex(AsyncWebServerRequest *request);
+void handlePageNotFound(AsyncWebServerRequest* request);
+
+int numConnectStart = 0;
+int numConnectLost = 0;
+
+void onWiFiConnect()
+{
+  ++numConnectStart;
+
+  Serial.println("Example: starting server");
+  server.on("/", HTTP_GET, handleIndex);
+  server.onNotFound(handlePageNotFound);
+  server.begin();
+}
+
+void onWiFiLost()
+{
+  ++numConnectLost;
+
+  Serial.println("Example: Shutting down server");
+  server.end();
+}
 
 void setup()
 {
@@ -21,11 +44,9 @@ void setup()
   while (!Serial);
 
   // ESP_NAME and ESP_AUTH are defined in platformio.ini for this example
+  stevesch::WiFiConnector::enableModeless(true);
+  stevesch::WiFiConnector::setOnConnected(handleWifiConnected);
   stevesch::WiFiConnector::setup(&server, ESP_NAME, ESP_AUTH);
-
-  server.on("/", HTTP_GET, handleIndex);
-  server.onNotFound(handlePageNotFound);
-  server.begin();
 }
 
 void loop()
@@ -47,13 +68,14 @@ void loop()
 void printWiFiStaus()
 {
   String strIp = WiFi.localIP().toString();
-  Serial.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d\n",
+  Serial.printf("Example: %10s %12s RSSI: %d  ch: %d  Tx: %d  +%d -%d =%d\n",
     WiFi.SSID().c_str(),
     strIp.c_str(),
-    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower()
+    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower(),
+    numConnectStart, numConnectLost, (numConnectStart - numConnectLost)
   );
   if (stevesch::WiFiConnector::isUpdating()) {
-    Serial.println("OTA update is being performed");
+    Serial.println("Example: OTA update is being performed");
   }
 }
 
@@ -87,6 +109,16 @@ String getLocalTime()
   return String(timeStringBuff);
 }
 
+void handleWifiConnected(bool connected)
+{
+  Serial.printf("Example: WiFi connected: %s\n", connected ? "TRUE" : "FALSE");
+  if (connected) {
+    onWiFiConnect();
+  } else {
+    onWiFiLost();
+  }
+}
+
 void handleIndex(AsyncWebServerRequest *request)
 {
   String strSsid(WiFi.SSID());
@@ -103,6 +135,6 @@ void handleIndex(AsyncWebServerRequest *request)
 }
 
 void handlePageNotFound(AsyncWebServerRequest* request) {
-  Serial.println("Callback: handlePageNotFound");
+  Serial.println("Example: handlePageNotFound");
   request->redirect("/");
 }

@@ -3,7 +3,8 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
-#include <ESPAsyncWiFiManager.h>
+// #include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.23
+#include <ESPAsync_WiFiManager.h> // https://github.com/khoih-prog/ESPAsync_WiFiManager
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
@@ -56,12 +57,15 @@ void setClockTime()
 }
 //////////////////////////////////////////////////////////////////////////////
 
-void handleConfig(AsyncWebServerRequest* request);
+// void handleConfig(AsyncWebServerRequest* request);
 
 void wiFiConnected();
 
+// typedef AsyncWiFiManager wifimgr_t;
+typedef ESPAsync_WiFiManager wifimgr_t;
+
 DNSServer dnsServer;
-AsyncWiFiManager* wiFiManager = nullptr;
+wifimgr_t* wiFiManager = nullptr;
 
 void otaSetup()
 {
@@ -128,13 +132,6 @@ void otaLoop()
   }
 }
 
-void configModeCallback(AsyncWiFiManager* mgr)
-{
-  Serial.println("WiFiConnector: Entered config mode");
-  Serial.println(WiFi.softAPIP());
-  Serial.println(mgr->getConfigPortalSSID());
-}
-
 //flag for saving data
 bool shouldSaveConfig = false;
 //callback notifying us of the need to save config
@@ -144,16 +141,32 @@ void saveConfigCallback ()
   shouldSaveConfig = true;
   indicateConfigActive(false);
 
-  // if (WiFi.isConnected()) {
-  //   wiFiConnected();
-  // }
-}
-
-void accessPointCallback(AsyncWiFiManager* mgr)
-{
   if (WiFi.isConnected()) {
     wiFiConnected();
   }
+}
+
+
+void printWiFiStaus()
+{
+  String strIp = WiFi.localIP().toString();
+  Serial.printf("WiFiConnector: %10s %12s RSSI: %d  ch: %d  Tx: %d\n",
+    WiFi.SSID().c_str(),
+    strIp.c_str(),
+    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower()
+  );
+  if (stevesch::WiFiConnector::isUpdating()) {
+    Serial.println("WiFiConnector: OTA update is being performed");
+  }
+}
+
+
+void apChangeCallback(wifimgr_t* mgr)
+{
+  Serial.println("WiFiConnector: apChangeCallback");
+  printWiFiStaus();
+  Serial.printf("Soft AP IP: %s\n", WiFi.softAPIP().toString().c_str());
+  Serial.printf("Config SSID: %s\n", mgr->getConfigPortalSSID().c_str());
 }
 
 void mgrSetup()
@@ -161,9 +174,8 @@ void mgrSetup()
   // WiFiManagerParameter custom_mqtt_server("server", "mqtt server", mqtt_server, 40);
   // wiFiManager->addParameter(&custom_mqtt_server);
 
-  wiFiManager->setAPCallback(configModeCallback);
+  wiFiManager->setAPCallback(apChangeCallback);
   wiFiManager->setSaveConfigCallback(saveConfigCallback);
-  wiFiManager->setAPCallback(accessPointCallback);
 
   mgrConfig();
 }
@@ -198,6 +210,7 @@ bool lastStatusConnected = false;
 
 void wiFiClear()
 {
+  Serial.println("WiFiConnector: wifiClear");
   if (WiFi.isConnected()) {
     onConnected(false);
   }
@@ -207,12 +220,11 @@ void wiFiClear()
   delay(100);
 }
 
-void handleConfig(AsyncWebServerRequest* request) {
-  String str = "WiFiConnector: handleConfig";
-  Serial.println(str);
-  mgrConfig();
-  request->redirect("/");
-}
+// void handleConfig(AsyncWebServerRequest* request) {
+//   Serial.println("WiFiConnector: handleConfig");
+//   mgrConfig();
+//   request->redirect("/");
+// }
 
 void wiFiConnected()
 {
@@ -242,15 +254,10 @@ void enableModeless(bool modeless)
   sModeless = modeless;
 }
 
-void setup(AsyncWebServer* server,
-  char const* configPortalName,
-  char const* configPortalPassword)
+
+void setup(AsyncWebServer* server, char const* configPortalName, char const* configPortalPassword)
 {
   Serial.println("WiFiConnector: Starting WiFi...");
-  // This is a little kludgy, but the AsyncWiFiManager constructor
-  wiFiManager = new AsyncWiFiManager(server, &dnsServer);
-
-  wiFiClear();
 
   if (configPortalPassword) {
     sConfigPortalPassword = configPortalPassword;
@@ -260,15 +267,24 @@ void setup(AsyncWebServer* server,
   } else {
     formatDeviceId(sConfigPortalName);
   }
-
   WiFi.setHostname(sConfigPortalName.c_str());
+
+  // This is a little kludgy, but the wifimgr_t constructor
+  wiFiManager = new wifimgr_t(server, &dnsServer);
+  // (&webServer, &dnsServer, "ModelessConnect");
+
+  wiFiClear();
 
   mgrSetup();
 
   // -- Set up required URL handlers on the web server.
-  server->on("/config", HTTP_GET, handleConfig);
+  // server->on("/config", HTTP_GET, handleConfig);
 
-  Serial.println("WiFiConnector: WiFi Ready.");
+  Serial.printf("WiFiConnector: WiFi Ready (Connected: %s)\n",
+    (WiFi.isConnected() ? "TRUE" : "FALSE"));
+  if (WiFi.isConnected()) {
+    onConnected(true);
+  }
 }
 
 void config()
