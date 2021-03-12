@@ -147,7 +147,7 @@ void saveConfigCallback ()
 }
 
 
-void printWiFiStaus()
+static void printWiFiStatus()
 {
   String strIp = WiFi.localIP().toString();
   Serial.printf("WiFiConnector: %10s %12s RSSI: %d  ch: %d  Tx: %d\n",
@@ -164,7 +164,7 @@ void printWiFiStaus()
 void apChangeCallback(wifimgr_t* mgr)
 {
   Serial.println("WiFiConnector: apChangeCallback");
-  printWiFiStaus();
+  printWiFiStatus();
   Serial.printf("Soft AP IP: %s\n", WiFi.softAPIP().toString().c_str());
   Serial.printf("Config SSID: %s\n", mgr->getConfigPortalSSID().c_str());
 }
@@ -267,11 +267,11 @@ void setup(AsyncWebServer* server, char const* configPortalName, char const* con
   } else {
     formatDeviceId(sConfigPortalName);
   }
-  WiFi.setHostname(sConfigPortalName.c_str());
+  const char* hostName = sConfigPortalName.c_str();
+  WiFi.setHostname(hostName);
 
   // This is a little kludgy, but the wifimgr_t constructor
-  wiFiManager = new wifimgr_t(server, &dnsServer);
-  // (&webServer, &dnsServer, "ModelessConnect");
+  wiFiManager = new wifimgr_t(server, &dnsServer, hostName);
 
   wiFiClear();
 
