@@ -17,11 +17,7 @@
     "maintainer": true
   },
   "dependencies" : [
-    {
-      "owner": "alanswx",
-      "name": "ESPAsyncWiFiManager",
-      "version": "^0.23"
-    },
+    "https://github.com/khoih-prog/ESPAsync_WiFiManager",
     "https://github.com/me-no-dev/ESPAsyncWebServer.git"
   ]
 }
