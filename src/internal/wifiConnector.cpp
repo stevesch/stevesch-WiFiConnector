@@ -270,10 +270,10 @@ void setup(AsyncWebServer* server, char const* configPortalName, char const* con
   const char* hostName = sConfigPortalName.c_str();
   WiFi.setHostname(hostName);
 
+  wiFiClear();
+
   // This is a little kludgy, but the wifimgr_t constructor
   wiFiManager = new wifimgr_t(server, &dnsServer, hostName);
-
-  wiFiClear();
 
   mgrSetup();
 
