@@ -125,6 +125,11 @@ void otaOnWifiConnect()
   MDNS.addService("_http", "_tcp", 80);
 }
 
+void otaOnWifiLost()
+{
+  ArduinoOTA.end();
+}
+
 void otaLoop()
 {
   if (WiFi.isConnected()) {
@@ -211,6 +216,7 @@ bool lastStatusConnected = false;
 void wiFiClear()
 {
   Serial.println("WiFiConnector: wifiClear");
+  otaOnWifiLost();
   if (WiFi.isConnected()) {
     onConnected(false);
   }
