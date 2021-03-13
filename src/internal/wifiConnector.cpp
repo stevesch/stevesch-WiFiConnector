@@ -70,7 +70,9 @@ wifimgr_t* wiFiManager = nullptr;
 void otaSetup()
 {
   if (!sConfigPortalName.isEmpty()) {
-    ArduinoOTA.setHostname(sConfigPortalName.c_str());
+    const char* hostname = sConfigPortalName.c_str();
+    Serial.printf("WiFiConnector: OTA Hostname = %s\n", hostname);
+    ArduinoOTA.setHostname(hostname);
   }
 
   // No authentication by default
@@ -116,6 +118,7 @@ void otaSetup()
 
 void otaOnWifiConnect()
 {
+  Serial.println("WiFiConnector: OTA begin");
   ArduinoOTA.begin();
   
   // Add service to MDNS-SD
@@ -127,6 +130,7 @@ void otaOnWifiConnect()
 
 void otaOnWifiLost()
 {
+  Serial.println("WiFiConnector: OTA end");
   ArduinoOTA.end();
 }
 
