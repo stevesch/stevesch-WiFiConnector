@@ -3,6 +3,7 @@
 #include <functional>
 
 class AsyncWebServer; // from <ESPAsyncWebServer.h>
+class Print;
 
 namespace stevesch
 {
@@ -25,6 +26,7 @@ void config();
 
 bool isUpdating(); // "isUpdating" == "an OTA update of code or files is occurring"
 
+void printStatus(Print& output); // log IP address, etc.
 }
 }
 
