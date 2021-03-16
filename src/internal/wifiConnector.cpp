@@ -3,8 +3,8 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
-// #include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.23
-#include <ESPAsync_WiFiManager.h> // https://github.com/khoih-prog/ESPAsync_WiFiManager
+#include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.23
+// #include <ESPAsync_WiFiManager.h> // https://github.com/khoih-prog/ESPAsync_WiFiManager
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
@@ -61,8 +61,8 @@ void setClockTime()
 
 void wiFiConnected();
 
-// typedef AsyncWiFiManager wifimgr_t;
-typedef ESPAsync_WiFiManager wifimgr_t;
+typedef AsyncWiFiManager wifimgr_t; // alanswx
+// typedef ESPAsync_WiFiManager wifimgr_t; // khoih-prog
 
 DNSServer dnsServer;
 wifimgr_t* wiFiManager = nullptr;
@@ -295,9 +295,11 @@ void setup(AsyncWebServer* server, char const* configPortalName, char const* con
   WiFi.setHostname(hostName);
 
   // This is a little kludgy, but the wifimgr_t constructor
-  wiFiManager = new wifimgr_t(server, &dnsServer, hostName);
+  wiFiManager = new wifimgr_t(server, &dnsServer); // alanswx
+  // wiFiManager = new wifimgr_t(server, &dnsServer, hostName); // khoih-prog
 
   mgrSetup();
+  yield();
 
   // -- Set up required URL handlers on the web server.
   // server->on("/config", HTTP_GET, handleConfig);
@@ -305,7 +307,8 @@ void setup(AsyncWebServer* server, char const* configPortalName, char const* con
   Serial.printf("WiFiConnector: WiFi Ready (Connected: %s)\n",
     (WiFi.isConnected() ? "TRUE" : "FALSE"));
   if (WiFi.isConnected()) {
-    onConnected(true);
+    wiFiConnected();
+    // onConnected(true);
   }
 }
 
