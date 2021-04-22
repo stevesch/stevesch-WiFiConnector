@@ -59,8 +59,6 @@ void setClockTime()
 
 // void handleConfig(AsyncWebServerRequest* request);
 
-void wiFiConnected();
-
 typedef AsyncWiFiManager wifimgr_t; // alanswx
 // typedef ESPAsync_WiFiManager wifimgr_t; // khoih-prog
 
@@ -275,6 +273,26 @@ void printStatus(Print& output)
   if (isUpdating()) {
     output.println("OTA update is being performed");
   }
+}
+
+// loop w/delays and yields until wifi is connected
+uint32_t waitForConnection(uint32_t timeoutMillis, uint32_t timeSliceMillis)
+{
+  // loop w/delays and yields until wifi is connected
+  unsigned long t0 = millis();
+  unsigned long elapsed = 0;
+  const unsigned long kWiFiWaitTime = timeoutMillis;
+  while (!WiFi.isConnected())
+  {
+    delay(timeSliceMillis);
+    unsigned long t1 = millis();
+    elapsed = t1 - t0;
+    if (elapsed >= kWiFiWaitTime) {
+      break;
+    }
+    yield();
+  }
+  return (uint32_t)elapsed;
 }
 
 void setup(AsyncWebServer* server, char const* configPortalName, char const* configPortalPassword)

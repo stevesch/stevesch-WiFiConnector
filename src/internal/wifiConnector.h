@@ -26,6 +26,7 @@ void config();
 
 bool isUpdating(); // "isUpdating" == "an OTA update of code or files is occurring"
 
+uint32_t waitForConnection(uint32_t timeoutMillis=3000, uint32_t timeSliceMillis=10);
 void printStatus(Print& output); // log IP address, etc.
 }
 }
