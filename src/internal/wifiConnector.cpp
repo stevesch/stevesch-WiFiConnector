@@ -159,11 +159,8 @@ void saveConfigCallback ()
 static void printWiFiStatus()
 {
   String strIp = WiFi.localIP().toString();
-  Serial.printf("WiFiConnector: %10s %12s RSSI: %d  ch: %d  Tx: %d\n",
-    WiFi.SSID().c_str(),
-    strIp.c_str(),
-    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower()
-  );
+  Serial.printf("WiFiConnector: ");
+  stevesch::WiFiConnector::printStatus();
   if (stevesch::WiFiConnector::isUpdating()) {
     Serial.println("WiFiConnector: OTA update is being performed");
   }
