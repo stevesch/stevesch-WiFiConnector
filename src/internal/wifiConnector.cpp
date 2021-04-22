@@ -271,7 +271,7 @@ void printStatus(Print& output)
     WiFi.SSID().c_str(),
     strIp.c_str(),
     WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower(),
-    (int)WiFi.status
+    (int)WiFi.status()
   );
   if (isUpdating()) {
     output.println("OTA update is being performed");
