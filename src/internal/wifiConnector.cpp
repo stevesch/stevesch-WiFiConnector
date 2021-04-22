@@ -158,12 +158,8 @@ void saveConfigCallback ()
 
 static void printWiFiStatus()
 {
-  String strIp = WiFi.localIP().toString();
   Serial.printf("WiFiConnector: ");
-  stevesch::WiFiConnector::printStatus();
-  if (stevesch::WiFiConnector::isUpdating()) {
-    Serial.println("WiFiConnector: OTA update is being performed");
-  }
+  stevesch::WiFiConnector::printStatus(Serial);
 }
 
 
@@ -264,7 +260,7 @@ void enableModeless(bool modeless)
 void printStatus(Print& output)
 {
   String strIp = WiFi.localIP().toString();
-  output.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d  S: %d\n",
+  output.printf("SSID: %10s  IP: %12s  RSSI: %d  ch: %d  Tx: %d  S: %d\n",
     WiFi.SSID().c_str(),
     strIp.c_str(),
     WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower(),
