@@ -149,10 +149,6 @@ void saveConfigCallback ()
   Serial.println("WiFiConnector: should save config");
   shouldSaveConfig = true;
   indicateConfigActive(false);
-
-  if (WiFi.isConnected()) {
-    wiFiConnected();
-  }
 }
 
 
@@ -170,6 +166,39 @@ void apChangeCallback(wifimgr_t* mgr)
   Serial.printf("Soft AP IP: %s\n", WiFi.softAPIP().toString().c_str());
   Serial.printf("Config SSID: %s\n", mgr->getConfigPortalSSID().c_str());
 }
+
+bool callbackInConnectedState = false;
+void checkWiFiConnection()
+{
+  bool connected = WiFi.isConnected();
+  if (callbackInConnectedState != connected)
+  {
+    callbackInConnectedState = connected;
+    Serial.printf("WiFiConnector: WiFi ");
+
+    if (connected) {
+      Serial.println("connected.");
+      otaSetup();
+      otaOnWifiConnect();
+      setClockTime();
+    } else {
+      Serial.println("disconnected.");
+      otaOnWifiLost();
+    }
+
+    onConnected(connected);
+  }
+}
+
+void wiFiClear()
+{
+  Serial.println("WiFiConnector: wifiClear");
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  checkWiFiConnection();
+  delay(100);
+}
+
 
 void mgrSetup()
 {
@@ -200,27 +229,14 @@ void mgrConfig()
   }
 }
 
+
 void mgrLoop()
 {
   // only for startConfigPortalModeless? causes log spam when startConfigPortal is used
   if (sModeless) {
     wiFiManager->loop();
   }
-}
-
-bool lastStatusConnected = false;
-
-void wiFiClear()
-{
-  Serial.println("WiFiConnector: wifiClear");
-  otaOnWifiLost();
-  if (WiFi.isConnected()) {
-    onConnected(false);
-  }
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  lastStatusConnected = WiFi.status() == WL_CONNECTED;
-  delay(100);
+  checkWiFiConnection();
 }
 
 // void handleConfig(AsyncWebServerRequest* request) {
@@ -228,16 +244,6 @@ void wiFiClear()
 //   mgrConfig();
 //   request->redirect("/");
 // }
-
-void wiFiConnected()
-{
-  Serial.println("WiFiConnector: WiFi connected.");
-  otaSetup();
-  otaOnWifiConnect();
-
-  setClockTime();
-  onConnected(true);
-}
 
 void formatDeviceId(String& nameOut)
 {
@@ -298,12 +304,10 @@ void setup(AsyncWebServer* server, char const* configPortalName, char const* con
   // -- Set up required URL handlers on the web server.
   // server->on("/config", HTTP_GET, handleConfig);
 
+  bool connected = WiFi.isConnected();
   Serial.printf("WiFiConnector: WiFi Ready (Connected: %s)\n",
-    (WiFi.isConnected() ? "TRUE" : "FALSE"));
-  if (WiFi.isConnected()) {
-    wiFiConnected();
-    // onConnected(true);
-  }
+    (connected ? "TRUE" : "FALSE"));
+  checkWiFiConnection();
 }
 
 void config()
