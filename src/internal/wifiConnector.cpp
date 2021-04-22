@@ -267,10 +267,11 @@ void enableModeless(bool modeless)
 void printStatus(Print& output)
 {
   String strIp = WiFi.localIP().toString();
-  output.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d\n",
+  output.printf("%10s %12s RSSI: %d  ch: %d  Tx: %d  S: %d\n",
     WiFi.SSID().c_str(),
     strIp.c_str(),
-    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower()
+    WiFi.RSSI(), WiFi.channel(), (int)WiFi.getTxPower(),
+    (int)WiFi.status
   );
   if (isUpdating()) {
     output.println("OTA update is being performed");
