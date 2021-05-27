@@ -1,6 +1,7 @@
 {
   "name": "stevesch-WiFiConnector",
-  "keywords": "WiFi, manager, config",
+  "version": "0.1.0",
+  "keywords": "WiFi, manager, OTA, over-the-air, updating, config",
   "description": "Simplified WiFi manager setup for Arduino and embedded applications",
   "repository":
   {
@@ -13,7 +14,7 @@
   "authors":
   {
     "name": "Stephen Schlueter",
-    "url": "",
+    "url": "https://github.com/stevesch",
     "maintainer": true
   },
   "dependencies" : [
