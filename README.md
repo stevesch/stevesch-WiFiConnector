@@ -1,8 +1,46 @@
 # stevesch-WiFiConnector
 
-Provides simplified WiFi Manager and over-the-air update setup (sketch basically just needs to call setup and loop for the library).
+Provides simplified setup for
+- WiFi Manager (allow you to specify your WiFi LAN without placing SSID/password in code)
+- over-the-air update (allow you to upload new code to your device via WiFi instead of USB)
+- MDNS (allow you to acceess your device by name, e.g. http://mydevice.local, rather than IP)
+
+Your sketch basically just needs to call setup and loop for the library.
 
 examples/minimal provides a simple sketch that loops and outputs status (current SSID, IP, etc.) on the serial port.
+
+code additions for minimal setup:
+```
+#include <ESPAsyncWebServer.h>
+#include <stevesch-WiFiConnector.h>
+AsyncWebServer server(80);
+
+// connect to "mydevice" with, e.g., your phone to configure
+// the WiFi network (LAN) that the ESP32 should use.  The following SSID
+// and password are used only for initial configuration of the ESP32:
+const char* ESP_NAME = "mydevice"; // SSID to broadcast to configure WiFi
+const char* ESP_AUTH = "00000000"; // auth must be at least 8 characters
+
+// once WiFi has been configured via, e.g. your phone, the device will
+// be available on your WiFi LAN via "http://mydevice.local" (and directly
+// via the IP addressed assigned to it, such as "http://192.168.xxx.xxx").
+
+void setup()
+{
+  // (your other setup code here)
+
+  stevesch::WiFiConnector::enableModeless(true);
+  // Add the following handler to serve a web page (see example for details):
+  // stevesch::WiFiConnector::setOnConnected(handleWifiConnected);
+  stevesch::WiFiConnector::setup(&server, ESP_NAME, ESP_AUTH);
+}
+
+void loop()
+{
+  stevesch::WiFiConnector::loop();
+  // (your other loop code here)
+}
+```
 
 # Building and Running
 
