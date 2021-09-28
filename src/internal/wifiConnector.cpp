@@ -24,6 +24,11 @@ const int   daylightOffset_sec = 3600;
 std::function<void (bool)> indicateConfigActive = [](bool active){};
 std::function<void (bool)> onConnected = [](bool connected){};
 
+std::function<void ()> otaOnStart = [](){};
+std::function<void (unsigned int, unsigned int)> otaOnProgress = [](unsigned int progress, unsigned int total){};
+std::function<void ()> otaOnEnd = [](){};
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 bool sbUpdating = false;
@@ -90,13 +95,16 @@ void otaSetup()
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       setUpdating(true);
       Serial.println("WiFiConnector: Start updating " + type);
+      otaOnStart();
     })
     .onEnd([]() {
       Serial.println("\nEnd");
       setUpdating(false);
+      otaOnEnd();
     })
     .onProgress([](unsigned int progress, unsigned int total) {
       Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+      otaOnProgress(progress, total);
     })
     .onError([](ota_error_t error) {
       setUpdating(false);
@@ -347,6 +355,21 @@ void setActivityIndicator(std::function<void (bool)> fn)
 void setOnConnected(std::function<void (bool)> fn)
 {
   onConnected = fn;
+}
+
+void setOtaOnStart(std::function<void ()> fn)
+{
+  otaOnStart = fn;
+}
+
+void setOtaOnProgress(std::function<void (unsigned int, unsigned int)> fn)
+{
+  otaOnProgress = fn;
+}
+
+void setOtaOnEnd(std::function<void ()> fn)
+{
+  otaOnEnd = fn;
 }
 
 bool isUpdating() {
