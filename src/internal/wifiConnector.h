@@ -15,6 +15,10 @@ void setActivityIndicator(std::function<void (bool)> callback);
 // callback for wifi connection started/lost
 void setOnConnected(std::function<void (bool)> fn);
 
+void setOtaOnStart(std::function<void ()> fn);
+void setOtaOnProgress(std::function<void (unsigned int, unsigned int)> fn);
+void setOtaOnEnd(std::function<void ()> fn);
+
 void enableModeless(bool modeless); // call before setup
 
 void setup(AsyncWebServer* server,
