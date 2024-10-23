@@ -3,7 +3,7 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
-#include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.23
+#include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.31
 // #include <ESPAsync_WiFiManager.h> // https://github.com/khoih-prog/ESPAsync_WiFiManager
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>

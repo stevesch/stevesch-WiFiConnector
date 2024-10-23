@@ -18,7 +18,7 @@
     "maintainer": true
   },
   "dependencies" : [
-    "alanswx/ESPAsyncWiFiManager@^0.23",
-    "https://github.com/ul-gh/ESPAsyncWebServer.git#3b8c659cf83da49ed95a96a85024a69237ad9711"
+    "alanswx/ESPAsyncWiFiManager@^0.31",
+    "https://github.com/mathieucarbou/ESPAsyncWebServer.git"
   ]
 }
