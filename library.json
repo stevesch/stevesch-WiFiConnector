@@ -19,6 +19,6 @@
   },
   "dependencies" : [
     "alanswx/ESPAsyncWiFiManager@^0.31",
-    "https://github.com/mathieucarbou/ESPAsyncWebServer.git"
+    "ESP32Async/ESPAsyncWebServer"
   ]
 }

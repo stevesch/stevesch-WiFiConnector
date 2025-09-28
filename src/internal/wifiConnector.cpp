@@ -3,8 +3,7 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
-#include <ESPAsyncWiFiManager.h>  // alanswx/ESPAsyncWiFiManager@^0.31
-// #include <ESPAsync_WiFiManager.h> // https://github.com/khoih-prog/ESPAsync_WiFiManager
+#include <ESPAsyncWiFiManager.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
@@ -374,6 +373,31 @@ void setOtaOnEnd(std::function<void ()> fn)
 
 bool isUpdating() {
   return sbUpdating;
+}
+
+stevesch::WiFiConnector::Status currentStatus()
+{
+  Status status;
+  status.connected = WiFi.isConnected();
+  if (status.connected) {
+    status.ip = WiFi.localIP();
+    status.ssid = WiFi.SSID();
+    status.rssi = WiFi.RSSI();
+    status.channel = WiFi.channel();
+  }
+  else
+  {
+    status.ip = IPAddress();
+    status.ssid = "";
+    status.rssi = 0;
+    status.channel = 0;
+  }
+  return status;
+}
+
+void getCurrentStatus(Status &out)
+{
+  out = currentStatus();
 }
 
 } // namespace WiFiConnector
